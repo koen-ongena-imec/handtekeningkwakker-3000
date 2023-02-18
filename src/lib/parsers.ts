@@ -122,7 +122,6 @@ function buildOutputExcelFileName(
 }
 
 
-
 export type TimesheetEntry = {
     day: string;
     name: string;
@@ -215,15 +214,6 @@ function extractFirstPageTextItems(
         TE.chain((page) => getTextContent(page)),
         TE.map((textContent) => textContent.items as TextItem[])
     );
-}
-
-export function extractDataFromFile(
-    pdfFilePath: string
-): TE.TaskEither<Error, PdfContent> {
-    const buffer = fs.readFileSync(pdfFilePath);
-    const array = new Uint8Array(buffer);
-
-    return extractDataFromUint8Array(array);
 }
 
 export function extractDataFromUint8Array(
