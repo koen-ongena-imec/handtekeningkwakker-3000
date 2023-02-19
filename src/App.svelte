@@ -6,6 +6,7 @@
     import SignatureUploader from "./lib/SignatureUploader.svelte";
     import ExcelTemplateUploader from "./lib/ExcelTemplateUploader.svelte";
     import DownloadExcel from "./lib/DownloadExcel.svelte";
+    import DownloadSignedPdf from "./lib/DownloadSignedPdf.svelte";
 </script>
 
 <main>
@@ -29,7 +30,7 @@
 
     <PdfData/>
 
-    <DownloadExcel/>
+    <DownloadExcel/><DownloadSignedPdf/>
 </main>
 
 <style>
