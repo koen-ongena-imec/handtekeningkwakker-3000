@@ -3,6 +3,7 @@
     import PdfFileUploader from "./lib/PdfFileUploader.svelte";
     import PdfData from "./lib/PdfData.svelte";
     import PdfViewer from "./lib/PdfViewer.svelte";
+    import SignatureUploader from "./lib/SignatureUploader.svelte";
 </script>
 
 <main>
@@ -15,8 +16,9 @@
 
 
     <div class="card">
+        <SignatureUploader/>
         <PdfFileUploader/>
-<!--        <PdfViewer/>-->
+        <!--        <PdfViewer/>-->
     </div>
 
     <PdfData/>

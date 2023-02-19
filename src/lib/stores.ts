@@ -13,3 +13,4 @@ export const pdfContent = writable<PdfContent>({
 });
 
 export const pdf = writable<Uint8Array>(new Uint8Array(0));
+export const signature = writable<Uint8Array>(new Uint8Array(0));
