@@ -4,6 +4,8 @@
     import PdfData from "./lib/PdfData.svelte";
     import PdfViewer from "./lib/PdfViewer.svelte";
     import SignatureUploader from "./lib/SignatureUploader.svelte";
+    import ExcelTemplateUploader from "./lib/ExcelTemplateUploader.svelte";
+    import DownloadExcel from "./lib/DownloadExcel.svelte";
 </script>
 
 <main>
@@ -16,12 +18,18 @@
 
 
     <div class="card">
+        <ExcelTemplateUploader/>
+        <br>
         <SignatureUploader/>
+        <br>
         <PdfFileUploader/>
         <!--        <PdfViewer/>-->
     </div>
 
+
     <PdfData/>
+
+    <DownloadExcel/>
 </main>
 
 <style>

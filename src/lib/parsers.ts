@@ -290,15 +290,6 @@ const createSummaryEntries = (pdfContent: PdfContent) => (o: Record<string, numb
     }
 };
 
-export function createSummary(pdfContent: PdfContent): SummaryEntry[] {
-    return pipe(
-        NEA.fromArray(pdfContent.timesheet),
-        O.map(NEA.groupBy((tse: TimesheetEntry) => tse.name)),
-        O.map(sumHours),
-        O.map(createSummaryEntries(pdfContent)),
-        O.getOrElse(() => [] as SummaryEntry[])
-    );
-}
 
 type ExcelConfig = { template: string; manager: string; outputFolder: string };
 
