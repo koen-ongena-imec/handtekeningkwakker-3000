@@ -7,16 +7,18 @@
     import ExcelTemplateUploader from "./lib/ExcelTemplateUploader.svelte";
     import DownloadExcel from "./lib/DownloadExcel.svelte";
     import DownloadSignedPdf from "./lib/DownloadSignedPdf.svelte";
+    import Stepper from "./lib/Stepper.svelte";
 </script>
 
 <main>
     <h1>Handtekeningkwakker 3000</h1>
-    <div>
-        <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-            <img src={stampLogo} class="logo svelte" alt="Svelte Logo"/>
-        </a>
-    </div>
+    <!--    <div>-->
+    <!--        <a href="https://svelte.dev" target="_blank" rel="noreferrer">-->
+    <!--            <img src={stampLogo} class="logo svelte" alt="Svelte Logo"/>-->
+    <!--        </a>-->
+    <!--    </div>-->
 
+    <!--    <Stepper />-->
 
     <div class="card">
         <ExcelTemplateUploader/>
@@ -30,7 +32,10 @@
 
     <PdfData/>
 
-    <DownloadExcel/><DownloadSignedPdf/>
+    <div class="flex mt-4">
+        <DownloadExcel/>
+        <DownloadSignedPdf/>
+    </div>
 </main>
 
 <style>

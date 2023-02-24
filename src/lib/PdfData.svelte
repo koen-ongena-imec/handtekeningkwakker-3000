@@ -17,22 +17,51 @@
     });
 </script>
 
-<div>
-    <label>Name: {data.nameOfTheConsultant}</label><br>
-    <label>Company: {data.companyName}</label><br>
-    <label>Period: {data.period}</label><br>
-    <table>
-        <tr>
-            <th>Project name</th>
-            <th>Code</th>
-            <th>Hours spent</th>
-        </tr>
-        {#each entries as row}
+
+<div class="flex gap-4 flex-col flex">
+    <div>
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+        <p>{data.nameOfTheConsultant}</p>
+    </div>
+    <div>
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company name</label>
+        <p>{data.companyName}</p>
+    </div>
+    <div>
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Period</label>
+        <p>{data.period}</p>
+    </div>
+
+    <div class="relative overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <td>{row.name}</td>
-                <td>{row.code}</td>
-                <td>{row.hours}</td>
+                <th scope="col" class="px-6 py-3">
+                    Project name
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Code
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Hours spent
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Days spent
+                </th>
             </tr>
-        {/each}
-    </table>
+            </thead>
+            <tbody>
+            {#each entries as row}
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <td class="px-6 py-4">{row.name}</td>
+                    <td class="px-6 py-4">{row.code}</td>
+                    <td class="px-6 py-4">{row.hours}</td>
+                    <td class="px-6 py-4">toDays({row.hours})</td>
+                </tr>
+            {/each}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+
