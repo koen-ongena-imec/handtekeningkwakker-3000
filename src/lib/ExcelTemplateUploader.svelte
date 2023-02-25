@@ -6,7 +6,7 @@
         const reader = new FileReader();
         reader.onload = (e) => {
             const bytes = new Uint8Array(e.target.result);
-            excelTemplate.set(bytes);
+            excelTemplate.set({bytes, name: file.name});
         };
         reader.readAsArrayBuffer(file);
     };

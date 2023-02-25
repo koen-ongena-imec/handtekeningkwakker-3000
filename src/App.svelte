@@ -20,19 +20,18 @@
 
     <!--    <Stepper />-->
 
-    <div class="card">
-        <ExcelTemplateUploader/>
-        <br>
+    <div class="flex flex-col gap-5 mb-4 mt-4">
+        <h2 class="text-4xl font-extrabold dark:text-white">Files</h2>
         <SignatureUploader/>
-        <br>
+        <ExcelTemplateUploader/>
         <PdfFileUploader/>
         <!--        <PdfViewer/>-->
     </div>
 
-
+    <h2 class="text-4xl font-extrabold dark:text-white">Extracted data</h2>
     <PdfData/>
 
-    <div class="flex mt-4">
+    <div class="flex mt-4 gap-4">
         <DownloadExcel/>
         <DownloadSignedPdf/>
     </div>

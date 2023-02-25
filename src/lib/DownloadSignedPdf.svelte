@@ -8,11 +8,12 @@
     import type {TextItem} from "pdfjs-dist/types/src/display/api";
     import type {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist";
     import {pdf as pdfStore, signature as signatureStore} from "./stores";
+    import type {UploadedFile} from "./stores";
     import {format} from "date-fns";
     import {PDFDocument, PDFImage} from "pdf-lib";
     import type {Either} from "fp-ts/Either";
 
-    let pdf;
+    let pdf: UploadedFile;
     pdfStore.subscribe(value => {
         pdf = value;
     });
@@ -57,10 +58,10 @@
         );
 
     function extractFirstPageTextItems(
-        pdfSrc: Uint8Array
+        pdfSrc: UploadedFile
     ): TE.TaskEither<Error, TextItem[]> {
         return pipe(
-            getDocument(pdfSrc),
+            getDocument(pdfSrc.bytes),
             TE.chain((doc) => getPage(1)(doc)),
             TE.chain((page: PDFPageProxy) => getTextContent(page)),
             TE.map((textContent) => textContent.items as TextItem[])
@@ -69,7 +70,7 @@
 
 
     export function findCustomerSignatureLabelPosition(
-        pdfSrc: Uint8Array
+        pdfSrc: UploadedFile
     ): TE.TaskEither<Error, Option<XY>> {
         return pipe(
             pdfSrc,
@@ -104,8 +105,8 @@
         }
     }
 
-    const addSignatureOnXY: (pdfBytes: Uint8Array, signature: Signature, options: SignedPdfOptions) => (xy: XY) => TE.TaskEither<Error, Uint8Array> = (
-        pdfBytes: Uint8Array,
+    const addSignatureOnXY: (pdf: UploadedFile, signature: Signature, options: SignedPdfOptions) => (xy: XY) => TE.TaskEither<Error, Uint8Array> = (
+        pdf: UploadedFile,
         signature: Signature,
         options: SignedPdfOptions
     ) => {
@@ -118,7 +119,7 @@
                 () => {
                     return new Promise(async (resolve, reject) => {
                         try {
-                            const pdfDoc = await PDFDocument.load(pdfBytes);
+                            const pdfDoc = await PDFDocument.load(pdf.bytes);
                             const firstPage = pdfDoc.getPage(0);
 
                             const image = await embedImage(pdfDoc, signature);
@@ -178,7 +179,7 @@
             const blob = new Blob([signedPdf.right], {type: "application/pdf"});
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = "fName.pdf";
+            link.download = signedPdfName;
             link.click();
             URL.revokeObjectURL(link.href);
         } else {
@@ -186,13 +187,16 @@
         }
     }
 
+    $: disabled = ((signedPdfName || '') === '') || !signature.name;
+    $: signedPdfName = (pdf.name.replace('.pdf', ' - signed.pdf'));
+
 </script>
 
 
-<button on:click={signPdf} type="button"
-        class="text-white bg-[#2557D6] hover:bg-[#2557D6]/90 focus:ring-4 focus:ring-[#2557D6]/50 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#2557D6]/50 mr-2 mb-2">
+<button disabled={disabled} on:click={signPdf} type="button"
+        class={ disabled ? "inline-flex text-white bg-blue-400 dark:bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center" : "text-white bg-[#2557D6] hover:bg-[#2557D6]/90 focus:ring-4 focus:ring-[#2557D6]/50 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#2557D6]/50 mr-2 mb-2"}>
     <svg class="w-6 h-6 mr-2 -ml-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
-    Download signed PDF
+    Download PDF
 </button>
