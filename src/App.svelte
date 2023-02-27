@@ -8,6 +8,7 @@
     import DownloadExcel from "./lib/DownloadExcel.svelte";
     import DownloadSignedPdf from "./lib/DownloadSignedPdf.svelte";
     import Stepper from "./lib/Stepper.svelte";
+    import SigningData from "./lib/SigningData.svelte";
 </script>
 
 <main>
@@ -27,6 +28,12 @@
         <PdfFileUploader/>
         <!--        <PdfViewer/>-->
     </div>
+
+    <div class="flex flex-col gap-5 mb-4 mt-4">
+        <h2 class="text-4xl font-extrabold dark:text-white">Your info</h2>
+        <SigningData/>
+    </div>
+
 
     <h2 class="text-4xl font-extrabold dark:text-white">Extracted data</h2>
     <PdfData/>

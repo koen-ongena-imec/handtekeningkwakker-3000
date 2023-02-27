@@ -1,7 +1,7 @@
 <script lang="ts">
     import type {PdfContent} from "./parsers";
     import {extractDataFromUint8Array} from "./parsers";
-    import {pdfContent} from "./stores";
+    import {pdfContentStore} from "./stores";
     import {pdf} from "./stores";
     import * as Either from "fp-ts/Either";
     import Dropzone from "./Dropzone.svelte";
@@ -17,8 +17,7 @@
                 Either.fold<Error, PdfContent>(e1 => {
                     console.log(e1);
                 }, e2 => {
-                    pdfContent.set(e2);
-                    console.log(e2);
+                    pdfContentStore.set(e2);
                 })(value);
             });
 

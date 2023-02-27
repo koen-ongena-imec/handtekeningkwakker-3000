@@ -357,7 +357,6 @@ const addSignatureOnXY = (
                         );
 
                         const newFileBytes = await pdfDoc.save();
-                        console.log("Writing signed PDF to " + outputPdfFilePath);
                         fs.writeFileSync(outputPdfFilePath, newFileBytes);
 
                         resolve(newFileBytes);

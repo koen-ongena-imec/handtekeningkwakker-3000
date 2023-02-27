@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {excelTemplate as excelTemplateStore, pdfContent, pdf} from "./stores";
     import type {UploadedFile} from "./stores";
+    import {excelTemplate as excelTemplateStore, pdf, pdfContentStore, signingData} from "./stores";
     import {createSummary} from "./Timesheet";
     import * as TE from "fp-ts/lib/TaskEither";
     import * as Excel from "exceljs";
@@ -14,11 +14,16 @@
     });
 
     let excelContent;
-    pdfContent.subscribe(value => {
+    pdfContentStore.subscribe(value => {
         excelContent = {
             ...value,
             summary: createSummary(value),
         }
+    });
+    let signingContent;
+    signingData.subscribe(value => {
+        signingContent = value;
+        return value;
     });
 
     let excelOutputName: string;
@@ -43,7 +48,7 @@
         return TE.of(err.message);
     }
 
-    function updateWorkbook(workbook, data) {
+    function updateWorkbook(workbook, data, signingContent) {
         const worksheet = workbook.getWorksheet(1);
         worksheet.getCell("B2").value = data.nameOfTheConsultant;
         worksheet.getCell("B3").value = data.companyName;
@@ -67,33 +72,50 @@
             date1904: false,
         };
 
-        worksheet.getCell("B22").value = manager;
-        worksheet.getCell("B23").value = format(new Date(), "yyyy-MM-dd");
+        worksheet.getCell("B22").value = signingContent.manager;
+        worksheet.getCell("B23").value = signingContent.signingDate;
+    }
+
+    function presentAsDownload(workbook) {
+        workbook.xlsx.writeBuffer().then((buffer) => {
+            const blob = new Blob([buffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = excelOutputName;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+    }
+
+    function download(bytes: Uint8Array) {
+        const data = excelContent;
+        return pipe(
+            readExcelFile(bytes),
+            TE.fold(handleError, (workbook) => {
+                updateWorkbook(workbook, data, signingContent);
+                presentAsDownload(workbook);
+                return TE.of("Hooray");
+            })
+        )();
     }
 
     function downloadExcel() {
-        if (excelContent && excelContent) {
-            const data = excelContent;
-            return pipe(
-                readExcelFile(excelTemplate.bytes),
-                TE.fold(handleError, (workbook) => {
-                    updateWorkbook(workbook, data);
+        if (!excelContent) {
+            return;
+        }
 
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        const blob = new Blob([buffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = excelOutputName;
-                        link.click();
-                        URL.revokeObjectURL(link.href);
-                    });
-                    return TE.of("Hooray");
-                })
-            )()
+        if (!excelTemplate.name) {
+            fetch("/template.xlsx")
+                .then((response) => response.arrayBuffer())
+                .then((buffer) => {
+                    download(new Uint8Array(buffer));
+                });
+        } else {
+            download(excelTemplate.bytes);
         }
     }
 
-    $: disabled = !excelOutputName || !excelTemplate.name;
+    $: disabled = !excelOutputName;
 </script>
 
 <button disabled={disabled} on:click={downloadExcel} type="button"
