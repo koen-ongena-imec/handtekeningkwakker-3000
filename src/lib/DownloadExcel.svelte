@@ -15,7 +15,8 @@
 
     let excelContent;
     pdfContent.subscribe(value => {
-        excelContent = value && {
+        excelContent = {
+            ...value,
             summary: createSummary(value),
         }
     });
