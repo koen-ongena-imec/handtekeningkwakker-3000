@@ -1,17 +1,16 @@
 <script lang="ts">
     import {pipe} from "fp-ts/function";
     import * as TE from "fp-ts/TaskEither";
+    import type {Either} from "fp-ts/Either";
     import * as E from "fp-ts/Either";
     import * as A from "fp-ts/Array";
     import type {Option} from "fp-ts/Option";
     import * as O from "fp-ts/Option";
     import type {TextItem} from "pdfjs-dist/types/src/display/api";
     import type {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist";
-    import {pdf as pdfStore, signature as signatureStore, signingData} from "./stores";
     import type {UploadedFile} from "./stores";
-    import {format} from "date-fns";
+    import {pdf as pdfStore, signature as signatureStore, signingData as signingDataStore} from "./stores";
     import {PDFDocument, PDFImage} from "pdf-lib";
-    import type {Either} from "fp-ts/Either";
 
     let pdf: UploadedFile;
     pdfStore.subscribe(value => {
@@ -31,7 +30,7 @@
     };
 
     let signingData;
-    signingData.subscribe(value => {
+    signingDataStore.subscribe(value => {
         signingData = value;
     });
 
@@ -116,7 +115,6 @@
         signature: Signature,
         options: SignedPdfOptions
     ) => {
-        const {manager} = options;
         // const outputPdfFilePath = buildSignedPdfOutputPath(pdfFilePath, options);
 
         // TODO this needs cleaning up :/
