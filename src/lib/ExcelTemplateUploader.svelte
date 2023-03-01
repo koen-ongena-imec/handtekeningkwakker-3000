@@ -1,6 +1,5 @@
 <script lang="ts">
     import {excelTemplate} from "./stores";
-    import template from '../../public/template.xlsx'
 
     const readBytes = (e) => {
         const file = e.target.files[0];
