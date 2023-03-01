@@ -3,7 +3,7 @@ import type {PdfContent, TimesheetEntry} from "./parsers";
 
 export type UploadedFile = { bytes: Uint8Array, name: string };
 
-let EMPTY_PDF_CONTENT = {
+let EMPTY_PDF_CONTENT: PdfContent = {
     companyName: "",
     nameOfTheConsultant: "",
     project: {
@@ -11,6 +11,7 @@ let EMPTY_PDF_CONTENT = {
 
     },
     period: '',
+    yearMonth: '',
     timesheet: [] as TimesheetEntry[]
 };
 
@@ -35,6 +36,7 @@ export const pdfContentStore = (() => {
         subscribe,
         update,
         set,
+        get: (): PdfContent => this,
         reset: () => set(EMPTY_PDF_CONTENT)
     };
 })();

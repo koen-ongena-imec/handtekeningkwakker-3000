@@ -9,13 +9,21 @@ function formatPeriod(firstDayOfMonth: Date, lastDayOfMonth: Date) {
   return `${formatDate(firstDayOfMonth)} - ${formatDate(lastDayOfMonth)}`;
 }
 
-export function parseMonthYearToPeriod(s: string): O.Option<string> {
+export function parseFirstDayOfTheMonth(s: string): O.Option<Date> {
   try {
     const firstDayOfMonth: Date = dates.parse(s, "MM/yyyy", new Date());
-    const lastDayOfMonth: Date = dates.lastDayOfMonth(firstDayOfMonth);
-
-    return O.some(formatPeriod(firstDayOfMonth, lastDayOfMonth));
+    return O.some(firstDayOfMonth);
   } catch (e) {
+    return O.none;
+  }
+}
+export function parseMonthYearToPeriod(s: string): O.Option<string> {
+  const firstDayOfTheMonth = parseFirstDayOfTheMonth(s);
+  console.log(firstDayOfTheMonth);
+  if (O.isSome(firstDayOfTheMonth)) {
+    const lastDayOfTheMonth = dates.lastDayOfMonth(firstDayOfTheMonth.value);
+    return O.some(formatPeriod(firstDayOfTheMonth.value, lastDayOfTheMonth));
+  } else {
     return O.none;
   }
 }

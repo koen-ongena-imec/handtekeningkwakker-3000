@@ -1,11 +1,11 @@
 <script lang="ts">
     import type {UploadedFile} from "./stores";
-    import {excelTemplate as excelTemplateStore, pdf, pdfContentStore, signingData} from "./stores";
+    import {excelTemplate as excelTemplateStore, pdfContentStore, signingData} from "./stores";
     import {createSummary} from "./Timesheet";
     import * as TE from "fp-ts/lib/TaskEither";
     import * as Excel from "exceljs";
-    import {format} from "date-fns";
     import {pipe} from "fp-ts/function";
+    import {buildSignedExcelFileName} from "./files";
 
     const manager = ' ME '
     let excelTemplate: UploadedFile;
@@ -14,21 +14,18 @@
     });
 
     let excelContent;
+    let excelOutputName: string;
     pdfContentStore.subscribe(value => {
         excelContent = {
             ...value,
             summary: createSummary(value),
         }
+        excelOutputName = buildSignedExcelFileName(value);
     });
     let signingContent;
     signingData.subscribe(value => {
         signingContent = value;
         return value;
-    });
-
-    let excelOutputName: string;
-    pdf.subscribe(value => {
-        excelOutputName = value?.name?.replace(/\.pdf$/, '.xlsx') || '';
     });
 
     function readExcelFile(data: Uint8Array): TE.TaskEither<Error, Excel.Workbook> {
@@ -119,6 +116,7 @@
 </script>
 
 <button disabled={disabled} on:click={downloadExcel} type="button"
+        title="Download {excelOutputName}"
         class={ disabled ? "inline-flex text-white bg-blue-400 dark:bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center" : "text-white bg-[#2557D6] hover:bg-[#2557D6]/90 focus:ring-4 focus:ring-[#2557D6]/50 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#2557D6]/50 mr-2 mb-2"}>
     <svg class="w-6 h-6 mr-2 -ml-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"
          viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
