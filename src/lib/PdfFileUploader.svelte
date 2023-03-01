@@ -4,11 +4,10 @@
     import {pdfContentStore} from "./stores";
     import {pdf} from "./stores";
     import * as Either from "fp-ts/Either";
-    import Dropzone from "./Dropzone.svelte";
 
     const readBytes = (e) => {
         // const file = e.detail;
-        const file = e.target.files[0];;
+        const file = e.target.files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
             const bytes = new Uint8Array(e.target.result);
@@ -17,6 +16,7 @@
                 Either.fold<Error, PdfContent>(e1 => {
                     console.log(e1);
                 }, e2 => {
+                    console.log(e2);
                     pdfContentStore.set(e2);
                 })(value);
             });

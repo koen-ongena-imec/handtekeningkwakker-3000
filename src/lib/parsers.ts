@@ -13,12 +13,11 @@ import {PDFDocument, PDFImage} from "pdf-lib";
 import fs from "fs";
 import {format} from "date-fns";
 import type {NonEmptyArray} from "fp-ts/NonEmptyArray";
-import * as NEA from "fp-ts/NonEmptyArray";
 import path from "path";
 
 import type {TextItem} from "pdfjs-dist/types/src/display/api";
 import type {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist";
-import {getPeriodForDate, parseMonthYearToPeriod} from "./dates";
+import {getPeriodForDate, parseFirstDayOfTheMonth, parseMonthYearToPeriod} from "./dates";
 
 function transformBasedOrdering(transformIndex: number) {
     return Ord.fromCompare((t1: TextItem, t2: TextItem) => {
@@ -52,9 +51,7 @@ const getDocument = (src: PdfSrc) =>
     taskEither.tryCatch<Error, PDFDocumentProxy>(
         async () => {
             const pdfJs = await import('pdfjs-dist/build/pdf');
-            const pdfJsWorker = await import('pdfjs-dist/build/pdf.worker.entry');
-
-            pdfJs.GlobalWorkerOptions.workerSrc = pdfJsWorker;
+            pdfJs.GlobalWorkerOptions.workerSrc = await import('pdfjs-dist/build/pdf.worker.entry');
 
             return pdfJs.getDocument(src).promise;
         },
@@ -138,6 +135,7 @@ export type PdfContent = {
     period: string;
     nameOfTheConsultant: string;
     companyName: string;
+    yearMonth: string;
     project: { name: string; code?: string };
     timesheet: TimesheetEntry[];
 };
@@ -195,11 +193,21 @@ function extractProject(textItems: TextItem[]): {
     );
 }
 
+function extractFirstDayOfMonth(textItems: TextItem[]): Date {
+    return pipe(
+        textItems,
+        getTextItemValueAfter("Month/Year"),
+        O.chain(parseFirstDayOfTheMonth),
+        O.getOrElse(() => new Date())
+    );
+}
+
 function extractData(textItems: TextItem[]): PdfContent {
     return {
         nameOfTheConsultant: extractName(textItems),
         companyName: "Tobania (host) / Codifly (employer)",
         period: extractPeriod(textItems),
+        yearMonth: format(extractFirstDayOfMonth(textItems), 'yyyy-MM'),
         timesheet: extractTimesheet(textItems),
         project: extractProject(textItems),
     };

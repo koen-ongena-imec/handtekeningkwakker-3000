@@ -9,12 +9,23 @@
     import type {TextItem} from "pdfjs-dist/types/src/display/api";
     import type {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist";
     import type {UploadedFile} from "./stores";
-    import {pdf as pdfStore, signature as signatureStore, signingData as signingDataStore} from "./stores";
+    import {
+        pdf as pdfStore,
+        pdfContentStore,
+        signature as signatureStore,
+        signingData as signingDataStore
+    } from "./stores";
     import {PDFDocument, PDFImage} from "pdf-lib";
+    import type {PdfContent} from "./parsers";
+    import {buildSignedPdfFileName} from "./files";
 
     let pdf: UploadedFile;
     pdfStore.subscribe(value => {
         pdf = value;
+    });
+    let pdfContent: PdfContent;
+    pdfContentStore.subscribe((value: PdfContent) => {
+        pdfContent = value;
     });
     type Signature = { bytes: Uint8Array, name: string };
     let signature: Signature;
@@ -193,12 +204,14 @@
     }
 
     $: disabled = ((signedPdfName || '') === '') || !signature.name;
-    $: signedPdfName = (pdf.name.replace('.pdf', ' - signed.pdf'));
+
+    $: signedPdfName = buildSignedPdfFileName(pdfContent);
 
 </script>
 
 
 <button disabled={disabled} on:click={signPdf} type="button"
+        title="Download {signedPdfName}"
         class={ disabled ? "inline-flex text-white bg-blue-400 dark:bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center" : "text-white bg-[#2557D6] hover:bg-[#2557D6]/90 focus:ring-4 focus:ring-[#2557D6]/50 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#2557D6]/50 mr-2 mb-2"}>
     <svg class="w-6 h-6 mr-2 -ml-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"
          viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
